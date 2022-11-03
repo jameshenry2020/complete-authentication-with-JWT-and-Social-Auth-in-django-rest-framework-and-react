@@ -24,7 +24,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', 'http://localhost:3000']
 
 
 # Application definition
@@ -38,12 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'social_accounts',
-    'rest_framework'
+    'rest_framework',
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -51,7 +53,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CORS_ALLOW_ALL_ORIGINS=True
+CORS_ALLOW_CREDENTIALS=True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+]
 ROOT_URLCONF = 'django_rest_auth.urls'
+
 
 TEMPLATES = [
     {
@@ -95,6 +103,12 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+GOOGLE_CLIENT_ID=env("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET=env("GOOGLE_CLIENT_SECRET")
+GITHUB_SECRET=env("GITHUB_SECRET")
+GITHUB_CLIENT_ID=env("GITHUB_CLIENT_ID")
+SOCIAL_AUTH_PASSWORD="jgk348030gjw03"
 
 
 # Password validation
