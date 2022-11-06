@@ -1,18 +1,24 @@
 import React, {useEffect, useState} from 'react'
 import axios from "axios"
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
+    const navigate=useNavigate()
     const [formdata, setFormdata]=useState({
         email:"",
         first_name:"",
         last_name:"",
         password:"",
-        confirm_password:""
+        password2:""
     })
+    const [error, setError]=useState('')
 
     const handleOnchange = (e)=>{
         setFormdata({...formdata, [e.target.name]:e.target.value})
     }
+
+    
     const handleSigninWithGoogle = async (response)=>{
         const payload=response.credential
         const server_res= await axios.post("http://localhost:8000/api/v1/auth/google/", {'access_token':payload})
@@ -32,15 +38,28 @@ const Signup = () => {
         
     }, [])
 
-    const {email, first_name, last_name, password, confirm_password}=formdata
+    const {email, first_name, last_name, password, password2}=formdata
    
+    const handleSubmit =async (e)=>{
+        e.preventDefault()
+       const response = await axios.post('http://localhost:8000/api/v1/auth/register/',formdata)
+       console.log(response.data)
+       const result=response.data
+       if (response.status === 201) {
+          navigate("/otp/verify")
+          toast.success(result.message)
+       }
+
+       
+
+    }
     
   return (
     <div>
         <div className='form-container'>
             <div style={{width:"100%"}} className='wrapper'>
             <h2>create account</h2>
-            <form action="">
+            <form action="" onSubmit={handleSubmit}>
                 <div className='form-group'>
                  <label htmlFor="">Email Address:</label>
                  <input type="text"
@@ -77,8 +96,8 @@ const Signup = () => {
                  <label htmlFor="">Confirm Password:</label>
                  <input type="text" 
                  className='p'  
-                 name="confirm_password" 
-                 value={confirm_password} 
+                 name="password2" 
+                 value={password2} 
                  onChange={handleOnchange}/>
                </div>
                <input type="submit" value="Submit" className="submitButton" />

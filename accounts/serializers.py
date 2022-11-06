@@ -1,4 +1,5 @@
 
+import json
 from dataclasses import field
 from .models import User
 from rest_framework import serializers
@@ -11,6 +12,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from .utils import send_normal_email
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -42,11 +44,12 @@ class LoginSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=155, min_length=6)
     password=serializers.CharField(max_length=68, write_only=True)
     full_name=serializers.CharField(max_length=255, read_only=True)
-    tokens=serializers.CharField(max_length=255, read_only=True)
+    access_token=serializers.CharField(max_length=255, read_only=True)
+    refresh_token=serializers.CharField(max_length=255, read_only=True)
 
     class Meta:
         model = User
-        fields = ['email', 'password', 'full_name', 'tokens']
+        fields = ['email', 'password', 'full_name', 'access_token', 'refresh_token']
 
     
 
@@ -59,11 +62,12 @@ class LoginSerializer(serializers.ModelSerializer):
             raise AuthenticationFailed("invalid credential try again")
         if not user.is_verified:
             raise AuthenticationFailed("Email is not verified")
-
+        tokens=user.tokens()
         return {
             'email':user.email,
             'full_name':user.get_full_name,
-            'tokens':user.tokens()
+            "access_token":str(tokens.get('access')),
+            "refresh_token":str(tokens.get('refresh'))
         }
 
 
@@ -122,7 +126,24 @@ class SetNewPasswordSerializer(serializers.Serializer):
 
 
     
+class LogoutUserSerializer(serializers.Serializer):
+    refresh_token=serializers.CharField()
 
+    default_error_message = {
+        'bad_token': ('Token is expired or invalid')
+    }
+
+    def validate(self, attrs):
+        self.token = attrs.get('refresh_token')
+
+        return attrs
+
+    def save(self, **kwargs):
+        try:
+            token=RefreshToken(self.token)
+            token.blacklist()
+        except TokenError:
+            return self.fail('bad_token')
 
     
 

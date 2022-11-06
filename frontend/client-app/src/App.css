@@ -85,6 +85,13 @@ h2 {
   padding: 8px;
   text-align: center;
 }
+.container{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
 
 input {
   border: 1px solid #d9d9d9;
@@ -126,4 +133,15 @@ label {
 }
 h3{
   margin: 0
+}
+.logout-btn{
+  padding:10px 22px;
+  outline: none;
+  width: 164px;
+  font-size: 14px;
+  font-weight: 600;
+  background-color: #e7461e;
+  border: none;
+  color: #fff;
+  border-radius: 5px;
 }

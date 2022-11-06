@@ -4,12 +4,13 @@ from django.shortcuts import render
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from accounts.models import OneTimePassword
-from accounts.serializers import PasswordResetRequestSerializer, UserRegisterSerializer, LoginSerializer, SetNewPasswordSerializer
+from accounts.serializers import PasswordResetRequestSerializer,LogoutUserSerializer, UserRegisterSerializer, LoginSerializer, SetNewPasswordSerializer
 from rest_framework import status
 from .utils import send_generated_otp_to_email
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import smart_str, DjangoUnicodeDecodeError
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from rest_framework.permissions import IsAuthenticated
 from .models import User
 # Create your views here.
 
@@ -36,7 +37,7 @@ class RegisterView(GenericAPIView):
 class VerifyUserEmail(GenericAPIView):
     def post(self, request):
         try:
-            passcode = request.data['otp']
+            passcode = request.data.get('otp')
             user_pass_obj=OneTimePassword.objects.get(otp=passcode)
             user=user_pass_obj.user
             if not user.is_verified:
@@ -56,6 +57,7 @@ class LoginUserView(GenericAPIView):
         serializer= self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class PasswordResetRequestView(GenericAPIView):
     serializer_class=PasswordResetRequestSerializer
@@ -92,4 +94,22 @@ class SetNewPasswordView(GenericAPIView):
         return Response({'success':True, 'message':"password reset is succesful"}, status=status.HTTP_200_OK)
 
 
+class TestingAuthenticatedReq(GenericAPIView):
+    permission_classes=[IsAuthenticated]
 
+    def get(self, request):
+
+        data={
+            'msg':'its works'
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+class LogoutApiView(GenericAPIView):
+    serializer_class=LogoutUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer=self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)

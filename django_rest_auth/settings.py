@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'accounts',
     'social_accounts',
     'rest_framework',
-    "corsheaders",
+    'corsheaders',
+    'rest_framework_simplejwt.token_blacklist',
+    
 ]
 
 MIDDLEWARE = [
@@ -95,14 +97,19 @@ DATABASES = {
 REST_FRAMEWORK={
     'NON_FIELD_ERRORS_KEY':'error',
         'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 
 }
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+DOMAIN='localhost:3000'
+SITE_NAME = 'Henry Ultimate Authentication Course'
 
 GOOGLE_CLIENT_ID=env("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET=env("GOOGLE_CLIENT_SECRET")
