@@ -90,7 +90,11 @@ class PasswordResetRequestSerializer(serializers.Serializer):
             abslink=f"http://{current_site}{relative_link}"
             print(abslink)
             email_body=f"Hi {user.first_name} use the link below to reset your password {abslink}"
-            data={'email_body':email_body, 'email_subject':"Reset your Password", 'to_email':user.email}
+            data={
+                'email_body':email_body, 
+                'email_subject':"Reset your Password", 
+                'to_email':user.email
+                }
             send_normal_email(data)
 
         return super().validate(attrs)

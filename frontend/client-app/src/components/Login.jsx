@@ -24,12 +24,32 @@ const Login = () => {
     }
 
     const  send_github__code_to_server = async()=>{
-        if (searchparams) {
-            const urlparam = searchparams.get('code')  
-            const resp = await AxiosInstance.post('auth/github/', {'code':urlparam})
-            const result = resp.data
-            console.log('server res: ',result)
-          }
+            if (searchparams) {
+                try {
+                const urlparam = searchparams.get('code')  
+                const resp = await AxiosInstance.post('auth/github/', {'code':urlparam})
+                const result = resp.data
+                console.log('server res: ',result)
+                if (resp.status===200) {
+                    const user ={
+                    'email':result.email,
+                    'names':result.full_name
+                }
+                localStorage.setItem('token', JSON.stringify(result.access_token))
+                localStorage.setItem('refresh_token', JSON.stringify(result.refresh_token))
+                localStorage.setItem('user', JSON.stringify(user))
+                navigate('/dashboard')
+                toast.success('login successful')
+                }
+              } catch (error) {
+                if (error.response) {
+                    
+                    console.log(error.response.data);
+                    toast.error(error.response.data.detail)
+                  } 
+                }  
+              }
+        
     } 
     let code =searchparams.get('code')
     useEffect(() => {
