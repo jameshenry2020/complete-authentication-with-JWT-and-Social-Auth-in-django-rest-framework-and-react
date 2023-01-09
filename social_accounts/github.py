@@ -11,7 +11,6 @@ class Github():
         get_access_token=requests.post("https://github.com/login/oauth/access_token", params=params_payload, headers={'Accept': 'application/json'})
         payload=get_access_token.json()
         token=payload.get('access_token')
-        print(payload)
         return token
         
 
@@ -21,7 +20,6 @@ class Github():
             headers={'Authorization': f'Bearer {access_token}'}
             resp = requests.get('https://api.github.com/user', headers=headers)
             user_data=resp.json()
-            print(user_data)
             return user_data
         except:
             raise AuthenticationFailed("invalid access_token", 401)

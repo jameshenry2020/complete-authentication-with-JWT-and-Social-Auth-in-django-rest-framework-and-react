@@ -49,8 +49,11 @@ def register_social_user(provider, email, first_name, last_name):
         user.is_verified=True
         user.save()
         login_user=authenticate(email=email, password=settings.SOCIAL_AUTH_PASSWORD)
+       
+        tokens=login_user.tokens()
         return {
             'email':login_user.email,
             'full_name':login_user.get_full_name,
-            'tokens':login_user.tokens()
+            "access_token":str(tokens.get('access')),
+            "refresh_token":str(tokens.get('refresh'))
         }

@@ -38,4 +38,12 @@ class GithubLoginSerializer(serializers.Serializer):
         if access_token:
             user_data=Github.get_github_user(access_token)
 
-        return user_data
+            full_name=user_data['name']
+            email=user_data['email']
+            names=full_name.split(" ")
+            firstName=names[1]
+            lastName=names[0]
+            provider='github'
+            return register_social_user(provider, email, firstName, lastName)
+
+        
